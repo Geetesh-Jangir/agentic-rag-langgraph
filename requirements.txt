@@ -5,11 +5,15 @@ langchain-groq==0.2.1
 langchain-huggingface==0.1.2
 langgraph==0.2.45
 
-# Embeddings (runs locally)
+# Vector store
+faiss-cpu==1.13.2
+
+# Embeddings
 sentence-transformers==2.7.0
 
-# LLM compatibility fix (solves Keras 3 error)
-transformers==4.44.0
+# Stable transformers (important fix)
+transformers==4.38.2
+tokenizers==0.15.2
 tf-keras
 
 # Web search
