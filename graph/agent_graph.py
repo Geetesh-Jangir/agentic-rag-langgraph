@@ -124,15 +124,16 @@ def build_agent_graph(tools: list):
 
         system_content = f"""You are a helpful research assistant.
 
-{memory_context}
+        {memory_context}
 
-Available tools:
-{tools_desc}
+        Available tools:
+        {tools_desc}
 
-Rules:
-- Use web_search for questions needing current or external information
-- Use calculator only for math calculations
-- If the question is a follow-up or refers to something already discussed, answer directly using the conversation context above without calling any tool"""
+        Rules:
+        - Use web_search for questions needing current or external information
+        - Use calculator only for math calculations
+        - If the question contains vague references like "this", "it", "that" with no clear context in the conversation history, do NOT call any tool — instead reply asking the user to clarify what they mean
+        - If the question is a follow-up to something already discussed, answer directly without calling any tool"""
 
         messages = [SystemMessage(content=system_content)]
 
@@ -214,11 +215,16 @@ Is this information relevant and useful to answer the query? Reply with just YES
         else:
             prompt = f"""{memory_context}
 
-    Answer the following question. Use the conversation history above if the question is a follow-up or refers to something previously discussed.
+        The user asked: "{state['query']}"
 
-    Question: {state['query']}
+        IMPORTANT RULES you must follow strictly:
+        - If the question contains vague words like "this", "it", "that", "these", "those" and there is NO clear reference to what "this/it/that" means in the conversation history above — respond with exactly:
+        "Your question is a bit unclear. Could you provide more context about what you are referring to? For example: 'What is used to build [specific topic]?'"
+        - If the question is about a specific topic that exists in the conversation history, answer using that context.
+        - If the question is genuinely answerable from general knowledge, answer it.
+        - Do NOT make assumptions about what "this" or "it" refers to if it is not clear from the conversation.
 
-    Answer:"""
+        Answer:"""
 
         response = smart_llm.invoke([HumanMessage(content=prompt)])
 
